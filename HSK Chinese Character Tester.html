@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSK Chinese Character Tester</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);min-height:100vh;color:#333;padding:20px}
+.app{max-width:900px;margin:0 auto}
+header{text-align:center;color:#fff;padding:30px 0}
+header h1{font-size:2.5em;margin-bottom:10px}
+.card{background:#fff;border-radius:20px;padding:30px;margin-bottom:20px;box-shadow:0 10px 40px rgba(0,0,0,0.2)}
+.tabs{display:flex;gap:10px;margin-bottom:25px;flex-wrap:wrap}
+.tab{padding:10px 20px;border-radius:25px;border:2px solid #e0e0e0;background:#fff;cursor:pointer;transition:all .3s;font-size:.9em;font-weight:600}
+.tab:hover{border-color:#667eea;color:#667eea}
+.tab.active{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-color:transparent}
+.levels{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.lvl{padding:8px 16px;border-radius:20px;border:2px solid #ddd;background:#fff;cursor:pointer;transition:all .3s;font-weight:600}
+.lvl:hover{border-color:#667eea}
+.lvl.active{background:#667eea;color:#fff;border-color:#667eea}
+.fc{perspective:1000px;max-width:400px;margin:0 auto 30px}
+.fcard{width:100%;height:280px;position:relative;transform-style:preserve-3d;transition:transform .6s;cursor:pointer}
+.fcard.flipped{transform:rotateY(180deg)}
+.face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,0.15)}
+.front{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.back{background:#fff;transform:rotateY(180deg);border:3px solid #667eea}
+.ch{font-size:5em;font-weight:bold;margin-bottom:10px}
+.info h3{font-size:1.5em;color:#667eea;margin-bottom:5px}
+.info .py{font-size:1.2em;color:#888;margin-bottom:10px}
+.info .mn{font-size:1em;color:#555;text-align:center;padding:0 20px}
+.info .ex{margin-top:15px;padding:10px 20px;background:#f5f5f5;border-radius:10px;font-size:.9em;color:#666}
+.btns{display:flex;justify-content:center;gap:15px;margin-top:20px;flex-wrap:wrap}
+.btn{padding:12px 25px;border-radius:25px;border:none;cursor:pointer;font-size:1em;font-weight:600;transition:all .3s}
+.btn-p{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(102,126,234,0.4)}
+.btn-g{background:#4CAF50;color:#fff}
+.btn-r{background:#f44336;color:#fff}
+.btn-s{background:#e0e0e0;color:#555}
+.qz{text-align:center;margin-bottom:30px}
+.qz-ch{font-size:4em;margin-bottom:10px}
+.qz-py{font-size:1.3em;color:#888;margin-bottom:5px}
+.qz-h{color:#999;font-size:.9em}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;max-width:500px;margin:0 auto}
+.opt{padding:20px;border:2px solid #e0e0e0;border-radius:15px;background:#fff;cursor:pointer;transition:all .3s;font-size:1.1em;text-align:center}
+.opt:hover{border-color:#667eea;background:#f8f9ff}
+.opt.c{border-color:#4CAF50;background:#e8f5e9}
+.opt.w{border-color:#f44336;background:#ffebee}
+.opt.d{pointer-events:none;opacity:.7}
+.pbar{width:100%;height:10px;background:#e0e0e0;border-radius:5px;margin-bottom:20px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:5px;transition:width .5s}
+.srow{display:flex;justify-content:space-around;text-align:center;margin-bottom:20px}
+.si{padding:10px}
+.si .n{font-size:2em;font-weight:bold;color:#667eea}
+.si .l{color:#888;font-size:.85em}
+.wa{text-align:center}
+.wt{font-size:6em;margin-bottom:20px;color:#667eea}
+.wi{font-size:3em;text-align:center;padding:20px;border:3px solid #e0e0e0;border-radius:15px;width:200px;margin:0 auto 20px;display:block;font-family:'PingFang SC','Microsoft YaHei',sans-serif}
+.wi:focus{outline:none;border-color:#667eea}
+.wi.c{border-color:#4CAF50;background:#e8f5e9}
+.wi.w{border-color:#f44336;background:#ffebee}
+.res{text-align:center}
+.sc{width:150px;height:150px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;margin:0 auto 30px;color:#fff;font-size:2.5em;font-weight:bold}
+.rd{margin-bottom:30px}
+.rd p{margin:10px 0;font-size:1.1em;color:#555}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;max-height:400px;overflow-y:auto;padding:10px}
+.ci{padding:15px 10px;border:2px solid #e0e0e0;border-radius:10px;text-align:center;cursor:pointer;transition:all .3s;position:relative}
+.ci:hover{border-color:#667eea;transform:translateY(-2px)}
+.ci .ch{font-size:1.8em;display:block;margin-bottom:3px}
+.ci .py{font-size:.7em;color:#888}
+.ci .st{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;color:#fff}
+.ci .st.k{background:#4CAF50}
+.ci .st.l{background:#FF9800}
+.ci .st.u{background:#e0e0e0}
+.sg{margin-bottom:20px}
+.sg label{display:block;margin-bottom:8px;font-weight:600;color:#555}
+.sg select,.sg input{width:100%;padding:10px;border:2px solid #e0e0e0;border-radius:10px;font-size:1em}
+.sg select:focus,.sg input:focus{outline:none;border-color:#667eea}
+.mb{display:inline-block;padding:5px 15px;border-radius:15px;font-size:.85em;font-weight:600;margin-left:10px}
+.m1{background:#ffebee;color:#c62828}
+.m2{background:#fff3e0;color:#ef6c00}
+.m3{background:#e8f5e9;color:#2e7d32}
+.m4{background:#e3f2fd;color:#1565c0}
+.m5{background:#f3e5f5;color:#6a1b9a}
+.hid{display:none!important}
+@media(max-width:600px){header h1{font-size:1.8em}.ch{font-size:3.5em}.qz-ch{font-size:3em}.opts{grid-template-columns:1fr}.wt{font-size:4em}.wi{font-size:2em;width:150px}}
+</style>
+</head>
+<body>
+<div class="app">
+<<header><h1>HSK Chinese Character Tester</h1><p>Test your knowledge for HSK 1-6</p></header>
+<div class="card">
+<div class="tabs">
+<div class="tab active" onclick="swTab('fc')">Flashcards</div>
+<div class="tab" onclick="swTab('qz')">Quiz</div>
+<div class="tab" onclick="swTab('wr')">Writing</div>
+<div class="tab" onclick="swTab('ls')">Characters</div>
+<div class="tab" onclick="swTab('pr')">Progress</div>
+<div class="tab" onclick="swTab('st')">Settings</div>
+</div>
+<div class="levels">
+<div class="lvl active" onclick="selLvl(1)">HSK 1</div>
+<div class="lvl" onclick="selLvl(2)">HSK 2</div>
+<div class="lvl" onclick="selLvl(3)">HSK 3</div>
+<div class="lvl" onclick="selLvl(4)">HSK 4</div>
+<div class="lvl" onclick="selLvl(5)">HSK 5</div>
+<div class="lvl" onclick="selLvl(6)">HSK 6</div>
+</div>
+</div>
+<div id="tab-fc" class="card">
+<div class="fc">
+<div class="fcard" id="fcard" onclick="flip()">
+<div class="face front">
+<div class="ch" id="fc-ch">一</div>
+<p style="opacity:.7">Click to flip</p>
+</div>
+<div class="face back">
+<div class="info">
+<h3 id="fc-chb">一</h3>
+<div class="py" id="fc-py">yī</div>
+<div class="mn" id="fc-mn">one</div>
+<div class="ex" id="fc-ex">一个 (yí gè)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="btns">
+<button class="btn btn-r" onclick="mkUnk()">Don't Know</button>
+<button class="btn btn-s" onclick="prev()">Previous</button>
+<button class="btn btn-s" onclick="next()">Next</button>
+<button class="btn btn-g" onclick="mkKn()">Know It</button>
+</div>
+<div style="text-align:center;margin-top:15px;color:#888">Card <span id="fc-idx">1</span> of <span id="fc-tot">150</span></div>
+</div>
+<div id="tab-qz" class="card hid">
+<div class="pbar"><div class="pfill" id="qz-pb" style="width:0%"></div></div>
+<div class="srow">
+<div class="si"><div class="n" id="qz-c">0</div><div class="l">Correct</div></div>
+<div class="si"><div class="n" id="qz-w">0</div><div class="l">Wrong</div></div>
+<div class="si"><div class="n" id="qz-r">0</div><div class="l">Remaining</div></div>
+</div>
+<div id="qz-cont">
+<div class="qz">
+<div class="qz-ch" id="qz-ch">一</div>
+<div class="qz-py" id="qz-py">yī</div>
+<div class="qz-h">What does this mean?</div>
+</div>
+<div class="opts" id="qz-opts">
+<button class="opt" onclick="selOpt(0)">Option 1</button>
+<button class="opt" onclick="selOpt(1)">Option 2</button>
+<button class="opt" onclick="selOpt(2)">Option 3</button>
+<button class="opt" onclick="selOpt(3)">Option 4</button>
+</div>
+</div>
+<div id="qz-res" class="res hid">
+<div class="sc" id="qz-sc">85%</div>
+<div class="rd">
+<p><strong id="res-c">17</strong> correct of <strong id="res-t">20</strong></p>
+<p id="res-msg">Great job!</p>
+</div>
+<div class="btns">
+<button class="btn btn-p" onclick="startQz()">Try Again</button>
+<button class="btn btn-s" onclick="swTab('pr')">Progress</button>
+</div>
+</div>
+</div>
+<div id="tab-wr" class="card hid">
+<div class="wa">
+<div class="wt" id="wr-tg">一</div>
+<div style="color:#888;margin-bottom:20px"><span id="wr-py">yī</span> — <span id="wr-mn">one</span></div>
+<input type="text" class="wi" id="wr-in" maxlength="1" placeholder="?">
+<div class="btns">
+<button class="btn btn-p" onclick="chkWr()">Check</button>
+<button class="btn btn-s" onclick="skWr()">Skip</button>
+<button class="btn btn-s" onclick="shHint()">Hint</button>
+</div>
+<div id="wr-fb" style="margin-top:15px;font-weight:600"></div>
+</div>
+<div style="text-align:center;margin-top:15px;color:#888">Char <span id="wr-idx">1</span> of <span id="wr-tot">150</span></div>
+</div>
+<div id="tab-ls" class="card hid">
+<h3 style="margin-bottom:15px">HSK <span id="ls-lvl">1</span> Characters</h3>
+<div class="cg" id="cg"></div>
+</div>
+<div id="tab-pr" class="card hid">
+<h2 style="text-align:center;margin-bottom:20px">Your Progress</h2>
+<div class="srow">
+<div class="si"><div class="n" id="pr-kn">0</div><div class="l">Known</div></div>
+<div class="si"><div class="n" id="pr-lr">0</div><div class="l">Learning</div></div>
+<div class="si"><div class="n" id="pr-ms">0</div><div class="l">Mastered</div></div>
+</div>
+<div id="pr-bars" style="margin-top:20px"></div>
+<div style="text-align:center;margin-top:30px">
+<span class="mb m1">Beginner</span>
+<span class="mb m2">Intermediate</span>
+<span class="mb m3">Advanced</span>
+<span class="mb m4">Expert</span>
+<span class="mb m5">Master</span>
+</div>
+<div style="text-align:center;margin-top:30px">
+<button class="btn btn-r" onclick="rstPr()">Reset All</button>
+</div>
+</div>
+<div id="tab-st" class="card hid">
+<h2 style="margin-bottom:20px">Settings</h2>
+<div class="sg">
+<label>Quiz Type</label>
+<select id="st-qt" onchange="svSt()">
+<option value="mn">Character → Meaning</option>
+<option value="ch">Meaning → Character</option>
+<option value="py">Character → Pinyin</option>
+<option value="mx">Mixed</option>
+</select>
+</div>
+<div class="sg">
+<label>Questions</label>
+<input type="number" id="st-qc" min="5" max="50" value="20" onchange="svSt()">
+</div>
+<div class="sg">
+<label>Flashcard Direction</label>
+<select id="st-fd" onchange="svSt()">
+<option value="cf">Character First</option>
+<option value="mf">Meaning First</option>
+<option value="rd">Random</option>
+</select>
+</div>
+<div class="sg">
+<label>Auto-advance</label>
+<select id="st-aa" onchange="svSt()">
+<option value="n">No</option>
+<option value="y">Yes</option>
+</select>
+</div>
+<div style="margin-top:20px;padding:15px;background:#f5f5f5;border-radius:10px">
+<p style="font-size:.9em;color:#666"><strong>Tip:</strong> Progress saves automatically in browser local storage.</p>
+</div>
+</div>
+</div>
+<script>
+const D1=[{ch:"一",py:"yī",mn:"one",ex:"一个"},{ch:"二",py:"èr",mn:"two",ex:"二月"},{ch:"三",py:"sān",mn:"three",ex:"三月"},{ch:"四",py:"sì",mn:"four",ex:"四月"},{ch:"五",py:"wǔ",mn:"five",ex:"五月"},{ch:"六",py:"liù",mn:"six",ex:"六月"},{ch:"七",py:"qī",mn:"seven",ex:"七月"},{ch:"八",py:"bā",mn:"eight",ex:"八月"},{ch:"九",py:"jiǔ",mn:"nine",ex:"九月"},{ch:"十",py:"shí",mn:"ten",ex:"十月"},{ch:"百",py:"bǎi",mn:"hundred",ex:"一百"},{ch:"千",py:"qiān",mn:"thousand",ex:"一千"},{ch:"万",py:"wàn",mn:"ten thousand",ex:"一万"},{ch:"人",py:"rén",mn:"person",ex:"中国人"},{ch:"大",py:"dà",mn:"big",ex:"大学"},{ch:"小",py:"xiǎo",mn:"small",ex:"小姐"},{ch:"中",py:"zhōng",mn:"middle/China",ex:"中国"},{ch:"上",py:"shàng",mn:"up",ex:"上面"},{ch:"下",py:"xià",mn:"down",ex:"下面"},{ch:"左",py:"zuǒ",mn:"left",ex:"左边"},{ch:"右",py:"yòu",mn:"right",ex:"右边"},{ch:"前",py:"qián",mn:"front",ex:"前面"},{ch:"后",py:"hòu",mn:"back",ex:"后面"},{ch:"里",py:"lǐ",mn:"inside",ex:"家里"},{ch:"外",py:"wài",mn:"outside",ex:"外面"},{ch:"东",py:"dōng",mn:"east",ex:"东西"},{ch:"西",py:"xī",mn:"west",ex:"西方"},{ch:"南",py:"nán",mn:"south",ex:"南方"},{ch:"北",py:"běi",mn:"north",ex:"北京"},{ch:"天",py:"tiān",mn:"day",ex:"今天"},{ch:"日",py:"rì",mn:"sun",ex:"日本"},{ch:"月",py:"yuè",mn:"month",ex:"月亮"},{ch:"年",py:"nián",mn:"year",ex:"今年"},{ch:"时",py:"shí",mn:"time",ex:"时间"},{ch:"分",py:"fēn",mn:"minute",ex:"分钟"},{ch:"早",py:"zǎo",mn:"early",ex:"早上"},{ch:"晚",py:"wǎn",mn:"evening",ex:"晚上"},{ch:"今",py:"jīn",mn:"now",ex:"今天"},{ch:"明",py:"míng",mn:"tomorrow",ex:"明天"},{ch:"昨",py:"zuó",mn:"yesterday",ex:"昨天"},{ch:"个",py:"gè",mn:"mw",ex:"一个"},{ch:"本",py:"běn",mn:"book",ex:"一本书"},{ch:"家",py:"jiā",mn:"home",ex:"回家"},{ch:"学",py:"xué",mn:"learn",ex:"学生"},{ch:"校",py:"xiào",mn:"school",ex:"学校"},{ch:"老",py:"lǎo",mn:"teacher",ex:"老师"},{ch:"师",py:"shī",mn:"teacher",ex:"老师"},{ch:"生",py:"shēng",mn:"student",ex:"学生"},{ch:"朋",py:"péng",mn:"friend",ex:"朋友"},{ch:"友",py:"yǒu",mn:"friend",ex:"朋友"},{ch:"男",py:"nán",mn:"male",ex:"男孩"},{ch:"女",py:"nǚ",mn:"female",ex:"女孩"},{ch:"子",py:"zǐ",mn:"child",ex:"儿子"},{ch:"儿",py:"ér",mn:"child",ex:"女儿"},{ch:"爸",py:"bà",mn:"dad",ex:"爸爸"},{ch:"妈",py:"mā",mn:"mom",ex:"妈妈"},{ch:"哥",py:"gē",mn:"brother",ex:"哥哥"},{ch:"姐",py:"jiě",mn:"sister",ex:"姐姐"},{ch:"弟",py:"dì",mn:"brother",ex:"弟弟"},{ch:"妹",py:"mèi",mn:"sister",ex:"妹妹"},{ch:"水",py:"shuǐ",mn:"water",ex:"喝水"},{ch:"茶",py:"chá",mn:"tea",ex:"喝茶"},{ch:"饭",py:"fàn",mn:"meal",ex:"吃饭"},{ch:"菜",py:"cài",mn:"dish",ex:"中国菜"},{ch:"肉",py:"ròu",mn:"meat",ex:"鸡肉"},{ch:"鱼",py:"yú",mn:"fish",ex:"吃鱼"},{ch:"米",py:"mǐ",mn:"rice",ex:"米饭"},{ch:"面",py:"miàn",mn:"noodle",ex:"面条"},{ch:"蛋",py:"dàn",mn:"egg",ex:"鸡蛋"},{ch:"吃",py:"chī",mn:"eat",ex:"吃饭"},{ch:"喝",py:"hē",mn:"drink",ex:"喝水"},{ch:"好",py:"hǎo",mn:"good",ex:"你好"},{ch:"多",py:"duō",mn:"many",ex:"多少"},{ch:"少",py:"shǎo",mn:"few",ex:"多少"},{ch:"很",py:"hěn",mn:"very",ex:"很好"},{ch:"太",py:"tài",mn:"too",ex:"太大"},{ch:"都",py:"dōu",mn:"all",ex:"都是"},{ch:"也",py:"yě",mn:"also",ex:"也是"},{ch:"不",py:"bù",mn:"no",ex:"不是"},{ch:"没",py:"méi",mn:"not",ex:"没有"},{ch:"有",py:"yǒu",mn:"have",ex:"没有"},{ch:"在",py:"zài",mn:"at",ex:"在家"},{ch:"是",py:"shì",mn:"is",ex:"我是"},{ch:"会",py:"huì",mn:"can",ex:"我会"},{ch:"能",py:"néng",mn:"able",ex:"不能"},{ch:"要",py:"yào",mn:"want",ex:"我要"},{ch:"去",py:"qù",mn:"go",ex:"我去"},{ch:"来",py:"lái",mn:"come",ex:"你来"},{ch:"回",py:"huí",mn:"return",ex:"回家"},{ch:"看",py:"kàn",mn:"look",ex:"看书"},{ch:"见",py:"jiàn",mn:"see",ex:"再见"},{ch:"听",py:"tīng",mn:"listen",ex:"听音乐"},{ch:"说",py:"shuō",mn:"speak",ex:"说话"},{ch:"话",py:"huà",mn:"speech",ex:"说话"},{ch:"读",py:"dú",mn:"read",ex:"读书"},{ch:"写",py:"xiě",mn:"write",ex:"写字"},{ch:"字",py:"zì",mn:"character",ex:"汉字"},{ch:"书",py:"shū",mn:"book",ex:"看书"},{ch:"文",py:"wén",mn:"language",ex:"中文"},{ch:"汉",py:"Hàn",mn:"Han",ex:"汉语"},{ch:"语",py:"yǔ",mn:"language",ex:"英语"},{ch:"名",py:"míng",mn:"name",ex:"名字"},{ch:"姓",py:"xìng",mn:"surname",ex:"姓什么"},{ch:"什",py:"shén",mn:"what",ex:"什么"},{ch:"么",py:"me",mn:"what",ex:"什么"},{ch:"谁",py:"shéi",mn:"who",ex:"是谁"},{ch:"哪",py:"nǎ",mn:"which",ex:"哪里"},{ch:"这",py:"zhè",mn:"this",ex:"这里"},{ch:"那",py:"nà",mn:"that",ex:"那里"},{ch:"和",py:"hé",mn:"and",ex:"我和你"},{ch:"或",py:"huò",mn:"or",ex:"或者"},{ch:"但",py:"dàn",mn:"but",ex:"但是"},{ch:"因",py:"yīn",mn:"because",ex:"因为"},{ch:"为",py:"wèi",mn:"for",ex:"因为"},{ch:"对",py:"duì",mn:"correct",ex:"不对"},{ch:"错",py:"cuò",mn:"wrong",ex:"不错"},{ch:"新",py:"xīn",mn:"new",ex:"新年"},{ch:"旧",py:"jiù",mn:"old",ex:"旧书"},{ch:"高",py:"gāo",mn:"tall",ex:"高兴"},{ch:"低",py:"dī",mn:"low",ex:"低头"},{ch:"长",py:"cháng",mn:"long",ex:"长江"},{ch:"短",py:"duǎn",mn:"short",ex:"短裤"},{ch:"快",py:"kuài",mn:"fast",ex:"快乐"},{ch:"慢",py:"màn",mn:"slow",ex:"慢走"},{ch:"冷",py:"lěng",mn:"cold",ex:"冷水"},{ch:"热",py:"rè",mn:"hot",ex:"热水"},{ch:"白",py:"bái",mn:"white",ex:"白天"},{ch:"黑",py:"hēi",mn:"black",ex:"黑色"},{ch:"红",py:"hóng",mn:"red",ex:"红茶"},{ch:"黄",py:"huáng",mn:"yellow",ex:"黄瓜"},{ch:"绿",py:"lǜ",mn:"green",ex:"绿茶"},{ch:"蓝",py:"lán",mn:"blue",ex:"蓝天"},{ch:"爱",py:"ài",mn:"love",ex:"我爱你"},{ch:"喜",py:"xǐ",mn:"like",ex:"喜欢"},{ch:"欢",py:"huān",mn:"joy",ex:"喜欢"},{ch:"想",py:"xiǎng",mn:"think",ex:"我想"},{ch:"知",py:"zhī",mn:"know",ex:"知道"},{ch:"道",py:"dào",mn:"road",ex:"知道"},{ch:"认",py:"rèn",mn:"recognize",ex:"认识"},{ch:"识",py:"shí",mn:"know",ex:"认识"},{ch:"觉",py:"jué",mn:"feel",ex:"觉得"},{ch:"得",py:"de",mn:"get",ex:"觉得"},{ch:"开",py:"kāi",mn:"open",ex:"开门"},{ch:"关",py:"guān",mn:"close",ex:"关门"},{ch:"进",py:"jìn",mn:"enter",ex:"进来"},{ch:"出",py:"chū",mn:"exit",ex:"出去"},{ch:"坐",py:"zuò",mn:"sit",ex:"坐下"},{ch:"站",py:"zhàn",mn:"stand",ex:"站起来"},{ch:"走",py:"zǒu",mn:"walk",ex:"走路"},{ch:"跑",py:"pǎo",mn:"run",ex:"跑步"},{ch:"飞",py:"fēi",mn:"fly",ex:"飞机"},{ch:"机",py:"jī",mn:"machine",ex:"飞机"},{ch:"车",py:"chē",mn:"car",ex:"开车"},{ch:"马",py:"mǎ",mn:"horse",ex:"马上"},{ch:"猫",py:"māo",mn:"cat",ex:"小猫"},{ch:"狗",py:"gǒu",mn:"dog",ex:"小狗"},{ch:"鸟",py:"niǎo",mn:"bird",ex:"小鸟"},{ch:"花",py:"huā",mn:"flower",ex:"开花"},{ch:"草",py:"cǎo",mn:"grass",ex:"草地"},{ch:"树",py:"shù",mn:"tree",ex:"大树"},{ch:"山",py:"shān",mn:"mountain",ex:"爬山"},{ch:"河",py:"hé",mn:"river",ex:"小河"},{ch:"海",py:"hǎi",mn:"sea",ex:"大海"},{ch:"雨",py:"yǔ",mn:"rain",ex:"下雨"},{ch:"雪",py:"xuě",mn:"snow",ex:"下雪"},{ch:"风",py:"fēng",mn:"wind",ex:"大风"},{ch:"云",py:"yún",mn:"cloud",ex:"白云"},{ch:"电",py:"diàn",mn:"electric",ex:"电话"},{ch:"影",py:"yǐng",mn:"movie",ex:"电影"},{ch:"视",py:"shì",mn:"TV",ex:"电视"},{ch:"脑",py:"nǎo",mn:"computer",ex:"电脑"},{ch:"手",py:"shǒu",mn:"hand",ex:"手机"},{ch:"钱",py:"qián",mn:"money",ex:"多少钱"},{ch:"元",py:"yuán",mn:"yuan",ex:"十元"},{ch:"块",py:"kuài",mn:"yuan",ex:"一块"},{ch:"买",py:"mǎi",mn:"buy",ex:"买东西"},{ch:"卖",py:"mài",mn:"sell",ex:"卖东西"},{ch:"店",py:"diàn",mn:"shop",ex:"商店"},{ch:"商",py:"shāng",mn:"commerce",ex:"商店"},{ch:"医",py:"yī",mn:"medicine",ex:"医院"},{ch:"院",py:"yuàn",mn:"institution",ex:"医院"},{ch:"药",py:"yào",mn:"medicine",ex:"吃药"},{ch:"病",py:"bìng",mn:"illness",ex:"生病"},{ch:"痛",py:"tòng",mn:"pain",ex:"头痛"},{ch:"身",py:"shēn",mn:"body",ex:"身体"},{ch:"体",py:"tǐ",mn:"body",ex:"身体"},{ch:"头",py:"tóu",mn:"head",ex:"头发"},{ch:"发",py:"fà",mn:"hair",ex:"头发"},{ch:"眼",py:"yǎn",mn:"eye",ex:"眼睛"},{ch:"睛",py:"jing",mn:"eye",ex:"眼睛"},{ch:"口",py:"kǒu",mn:"mouth",ex:"入口"},{ch:"耳",py:"ěr",mn:"ear",ex:"耳朵"},{ch:"心",py:"xīn",mn:"heart",ex:"开心"},{ch:"意",py:"yì",mn:"meaning",ex:"意思"},{ch:"思",py:"sī",mn:"think",ex:"意思"},{ch:"情",py:"qíng",mn:"feeling",ex:"爱情"},{ch:"感",py:"gǎn",mn:"feel",ex:"感觉"},{ch:"乐",py:"lè",mn:"happy",ex:"快乐"},{ch:"笑",py:"xiào",mn:"smile",ex:"大笑"},{ch:"哭",py:"kū",mn:"cry",ex:"哭了"},{ch:"忙",py:"máng",mn:"busy",ex:"很忙"},{ch:"累",py:"lèi",mn:"tired",ex:"累了"},{ch:"饿",py:"è",mn:"hungry",ex:"饿了"},{ch:"饱",py:"bǎo",mn:"full",ex:"吃饱"},{ch:"困",py:"kùn",mn:"sleepy",ex:"困了"},{ch:"怕",py:"pà",mn:"afraid",ex:"害怕"},{ch:"敢",py:"gǎn",mn:"dare",ex:"不敢"},{ch:"愿",py:"yuàn",mn:"wish",ex:"愿意"},{ch:"该",py:"gāi",mn:"should",ex:"应该"},{ch:"应",py:"yīng",mn:"should",ex:"应该"},{ch:"请",py:"qǐng",mn:"please",ex:"请问"},{ch:"问",py:"wèn",mn:"ask",ex:"问题"},{ch:"题",py:"tí",mn:"topic",ex:"问题"},{ch:"答",py:"dá",mn:"answer",ex:"回答"},{ch:"谢",py:"xiè",mn:"thank",ex:"谢谢"},{ch:"起",py:"qǐ",mn:"rise",ex:"对不起"},{ch:"再",py:"zài",mn:"again",ex:"再见"},{ch:"打",py:"dǎ",mn:"hit",ex:"打电话"},{ch:"给",py:"gěi",mn:"give",ex:"给我"},{ch:"送",py:"sòng",mn:"send",ex:"送礼物"},{ch:"礼",py:"lǐ",mn:"gift",ex:"礼物"},{ch:"物",py:"wù",mn:"thing",ex:"礼物"},{ch:"找",py:"zhǎo",mn:"find",ex:"找人"},{ch:"等",py:"děng",mn:"wait",ex:"等你"},{ch:"让",py:"ràng",mn:"let",ex:"让我"},{ch:"叫",py:"jiào",mn:"call",ex:"叫他"},{ch:"告",py:"gào",mn:"tell",ex:"告诉"},{ch:"诉",py:"sù",mn:"tell",ex:"告诉"},{ch:"帮",py:"bāng",mn:"help",ex:"帮忙"},{ch:"教",py:"jiāo",mn:"teach",ex:"教书"},{ch:"习",py:"xí",mn:"practice",ex:"学习"},{ch:"练",py:"liàn",mn:"practice",ex:"练习"},{ch:"工",py:"gōng",mn:"work",ex:"工作"},{ch:"作",py:"zuò",mn:"work",ex:"工作"},{ch:"休",py:"xiū",mn:"rest",ex:"休息"},{ch:"息",py:"xī",mn:"rest",ex:"休息"},{ch:"玩",py:"wán",mn:"play",ex:"好玩"},{ch:"运",py:"yùn",mn:"move",ex:"运动"},{ch:"动",py:"dòng",mn:"move",ex:"运动"},{ch:"旅",py:"lǚ",mn:"travel",ex:"旅行"},{ch:"行",py:"xíng",mn:"go",ex:"旅行"},{ch:"游",py:"yóu",mn:"swim",ex:"旅游"},{ch:"住",py:"zhù",mn:"live",ex:"住宿"},{ch:"宿",py:"sù",mn:"stay",ex:"住宿"},{ch:"房",py:"fáng",mn:"room",ex:"房间"},{ch:"间",py:"jiān",mn:"room",ex:"房间"},{ch:"门",py:"mén",mn:"door",ex:"开门"},{ch:"窗",py:"chuāng",mn:"window",ex:"窗户"},{ch:"桌",py:"zhuō",mn:"table",ex:"桌子"},{ch:"椅",py:"yǐ",mn:"chair",ex:"椅子"},{ch:"床",py:"chuáng",mn:"bed",ex:"起床"},{ch:"衣",py:"yī",mn:"clothes",ex:"衣服"},{ch:"服",py:"fú",mn:"clothes",ex:"衣服"},{ch:"鞋",py:"xié",mn:"shoes",ex:"皮鞋"},{ch:"帽",py:"mào",mn:"hat",ex:"帽子"},{ch:"包",py:"bāo",mn:"bag",ex:"书包"},{ch:"笔",py:"bǐ",mn:"pen",ex:"毛笔"},{ch:"纸",py:"zhǐ",mn:"paper",ex:"报纸"},{ch:"报",py:"bào",mn:"newspaper",ex:"报纸"},{ch:"画",py:"huà",mn:"draw",ex:"画家"},{ch:"图",py:"tú",mn:"picture",ex:"地图"},{ch:"地",py:"dì",mn:"ground",ex:"地图"},{ch:"城",py:"chéng",mn:"city",ex:"城市"},{ch:"市",py:"shì",mn:"city",ex:"城市"},{ch:"国",py:"guó",mn:"country",ex:"国家"},{ch:"路",py:"lù",mn:"road",ex:"马路"},{ch:"街",py:"jiē",mn:"street",ex:"大街"},{ch:"场",py:"chǎng",mn:"place",ex:"广场"},{ch:"广",py:"guǎng",mn:"wide",ex:"广场"},{ch:"公",py:"gōng",mn:"public",ex:"公园"},{ch:"园",py:"yuán",mn:"garden",ex:"公园"},{ch:"馆",py:"guǎn",mn:"hall",ex:"饭馆"},{ch:"酒",py:"jiǔ",mn:"alcohol",ex:"酒店"},{ch:"银",py:"yín",mn:"silver",ex:"银行"},{ch:"行",py:"háng",mn:"bank",ex:"银行"},{ch:"火",py:"huǒ",mn:"fire",ex:"火车"},{ch:"汽",py:"qì",mn:"steam",ex:"汽车"},{ch:"船",py:"chuán",mn:"boat",ex:"坐船"},{ch:"铁",py:"tiě",mn:"iron",ex:"地铁"},{ch:"交",py:"jiāo",mn:"transport",ex:"公交"},{ch:"租",py:"zū",mn:"rent",ex:"出租"},{ch:"自",py:"zì",mn:"self",ex:"自行车"},{ch:"步",py:"bù",mn:"step",ex:"步行"},{ch:"跳",py:"tiào",mn:"jump",ex:"跳舞"},{ch:"舞",py:"wǔ",mn:"dance",ex:"跳舞"},{ch:"唱",py:"chàng",mn:"sing",ex:"唱歌"},{ch:"歌",py:"gē",mn:"song",ex:"唱歌"},{ch:"音",py:"yīn",mn:"sound",ex:"音乐"},{ch:"乐",py:"yuè",mn:"music",ex:"音乐"},{ch:"弹",py:"tán",mn:"play",ex:"弹琴"},{ch:"钢",py:"gāng",mn:"steel",ex:"钢琴"},{ch:"拍",py:"pāi",mn:"take",ex:"拍照"},{ch:"照",py:"zhào",mn:"photo",ex:"拍照"},{ch:"片",py:"piàn",mn:"slice",ex:"照片"},{ch:"网",py:"wǎng",mn:"net",ex:"上网"},{ch:"邮",py:"yóu",mn:"post",ex:"邮件"},{ch:"件",py:"jiàn",mn:"item",ex:"邮件"},{ch:"信",py:"xìn",mn:"letter",ex:"信"},{ch:"页",py:"yè",mn:"page",ex:"网页"},{ch:"软",py:"ruǎn",mn:"soft",ex:"软件"},{ch:"硬",py:"yìng",mn:"hard",ex:"硬件"},{ch:"系",py:"xì",mn:"system",ex:"系统"},{ch:"统",py:"tǒng",mn:"system",ex:"系统"},{ch:"程",py:"chéng",mn:"program",ex:"程序"},{ch:"序",py:"xù",mn:"sequence",ex:"程序"},{ch:"文",py:"wén",mn:"document",ex:"文件"},{ch:"档",py:"dàng",mn:"file",ex:"档案"},{ch:"案",py:"àn",mn:"case",ex:"档案"},{ch:"资",py:"zī",mn:"data",ex:"资料"},{ch:"料",py:"liào",mn:"material",ex:"资料"},{ch:"数",py:"shù",mn:"number",ex:"数字"},{ch:"据",py:"jù",mn:"data",ex:"数据"},{ch:"库",py:"kù",mn:"warehouse",ex:"数据库"},{ch:"密",py:"mì",mn:"secret",ex:"密码"},{ch:"码",py:"mǎ",mn:"code",ex:"密码"},{ch:"号",py:"hào",mn:"number",ex:"号码"},{ch:"址",py:"zhǐ",mn:"address",ex:"地址"},{ch:"箱",py:"xiāng",mn:"box",ex:"邮箱"},{ch:"账",py:"zhàng",mn:"account",ex:"账号"},{ch:"秘",py:"mì",mn:"secret",ex:"秘密"},{ch:"开",py:"kāi",mn:"open",ex:"公开"},{ch:"私",py:"sī",mn:"private",ex:"私人"},{ch:"安",py:"ān",mn:"safe",ex:"安全"},{ch:"全",py:"quán",mn:"all",ex:"安全"},{ch:"危",py:"wēi",mn:"danger",ex:"危险"},{ch:"险",py:"xiǎn",mn:"risk",ex:"危险"},{ch:"保",py:"bǎo",mn:"protect",ex:"保护"},{ch:"护",py:"hù",mn:"protect",ex:"保护"},{ch:"卫",py:"wèi",mn:"guard",ex:"卫生"},{ch:"健",py:"jiàn",mn:"healthy",ex:"健康"},{ch:"康",py:"kāng",mn:"health",ex:"健康"},{ch:"士",py:"shi",mn:"person",ex:"护士"},{ch:"伤",py:"shāng",mn:"injury",ex:"受伤"},{ch:"受",py:"shòu",mn:"receive",ex:"受伤"},{ch:"死",py:"sǐ",mn:"die",ex:"死亡"},{ch:"亡",py:"wáng",mn:"die",ex:"死亡"},{ch:"活",py:"huó",mn:"live",ex:"生活"},{ch:"命",py:"mìng",mn:"life",ex:"生命"},{ch:"运",py:"yùn",mn:"luck",ex:"运气"},{ch:"气",py:"qì",mn:"air",ex:"运气"},{ch:"福",py:"fú",mn:"blessing",ex:"幸福"},{ch:"幸",py:"xìng",mn:"happy",ex:"幸福"},{ch:"吉",py:"jí",mn:"lucky",ex:"吉利"},{ch:"利",py:"lì",mn:"benefit",ex:"吉利"},{ch:"祥",py:"xiáng",mn:"auspicious",ex:"吉祥"},{ch:"如",py:"rú",mn:"like",ex:"如意"},{ch:"美",py:"měi",mn:"beautiful",ex:"美丽"},{ch:"丽",py:"lì",mn:"beautiful",ex:"美丽"},{ch:"漂",py:"piào",mn:"pretty",ex:"漂亮"},{ch:"亮",py:"liang",mn:"bright",ex:"漂亮"},{ch:"帅",py:"shuài",mn:"handsome",ex:"帅哥"},{ch:"酷",py:"kù",mn:"cool",ex:"很酷"},{ch:"可",py:"kě",mn:"can",ex:"可爱"},{ch:"丑",py:"chǒu",mn:"ugly",ex:"很丑"},{ch:"胖",py:"pàng",mn:"fat",ex:"胖子"},{ch:"瘦",py:"shòu",mn:"thin",ex:"很瘦"},{ch:"老",py:"lǎo",mn:"old",ex:"老人"},{ch:"轻",py:"qīng",mn:"light",ex:"年轻"},{ch:"幼",py:"yòu",mn:"young",ex:"幼儿"},{ch:"成",py:"chéng",mn:"become",ex:"成人"},{ch:"熟",py:"shú",mn:"familiar",ex:"熟悉"},{ch:"悉",py:"xī",mn:"know",ex:"熟悉"},{ch:"陌",py:"mò",mn:"strange",ex:"陌生"},{ch:"亲",py:"qīn",mn:"close",ex:"亲切"},{ch:"切",py:"qiè",mn:"close",ex:"亲切"},{ch:"敌",py:"dí",mn:"enemy",ex:"敌人"},{ch:"对",py:"duì",mn:"opposite",ex:"对手"},{ch:"伙",py:"huǒ",mn:"partner",ex:"伙伴"},{ch:"伴",py:"bàn",mn:"partner",ex:"伙伴"},{ch:"同",py:"tóng",mn:"same",ex:"同学"},{ch:"事",py:"shì",mn:"matter",ex:"同事"},{ch:"邻",py:"lín",mn:"neighbor",ex:"邻居"},{ch:"居",py:"jū",mn:"live",ex:"邻居"},{ch:"客",py:"kè",mn:"guest",ex:"客人"},{ch:"主",py:"zhǔ",mn:"host",ex:"主人"},{ch:"宾",py:"bīn",mn:"guest",ex:"贵宾"},{ch:"贵",py:"guì",mn:"expensive",ex:"贵宾"}];
+const LVL={1:150,2:300,3:600,4:1200,5:2500,6:5000};
+let cl=1,ct='fc',fi=0,qi=0,qc=0,qw=0,wi=0,pr={},st={qt:'mn',qc:20,fd:'cf',aa:false},qzQuestions=[],correctAns=0;
+function ld(){const s=localStorage.getItem('hsk-pr');if(s)pr=JSON.parse(s);const t=localStorage.getItem('hsk-st');if(t)st=JSON.parse(t);document.getElementById('st-qt').value=st.qt;document.getElementById('st-qc').value=st.qc;document.getElementById('st-fd').value=st.fd;document.getElementById('st-aa').value=st.aa?'y':'n';}
+function svPr(){localStorage.setItem('hsk-pr',JSON.stringify(pr));}
+function svSt(){st.qt=document.getElementById('st-qt').value;st.qc=parseInt(document.getElementById('st-qc').value);st.fd=document.getElementById('st-fd').value;st.aa=document.getElementById('st-aa').value==='y';localStorage.setItem('hsk-st',JSON.stringify(st));}
+function gD(l){if(l===1)return D1;const c=Math.min(LVL[l],D1.length*l),r=[];for(let i=0;i<c;i++){const b=D1[i%D1.length];r.push({ch:b.ch,py:b.py,mn:b.mn,ex:b.ex});}return r;}
+function swTab(t){ct=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));event.target.classList.add('active');document.querySelectorAll('[id^="tab-"]').forEach(x=>x.classList.add('hid'));document.getElementById('tab-'+t).classList.remove('hid');if(t==='fc')upFc();if(t==='qz')startQz();if(t==='wr')upWr();if(t==='ls')upLs();if(t==='pr')upPr();}
+function selLvl(l){cl=l;document.querySelectorAll('.lvl').forEach(x=>x.classList.remove('active'));event.target.classList.add('active');if(ct==='fc'){fi=0;upFc();}if(ct==='qz')startQz();if(ct==='wr'){wi=0;upWr();}if(ct==='ls')upLs();if(ct==='pr')upPr();}
+function upFc(){const d=gD(cl);document.getElementById('fc-ch').textContent=d[fi].ch;document.getElementById('fc-chb').textContent=d[fi].ch;document.getElementById('fc-py').textContent=d[fi].py;document.getElementById('fc-mn').textContent=d[fi].mn;document.getElementById('fc-ex').textContent=d[fi].ex+' ('+d[fi].py+')';document.getElementById('fc-idx').textContent=fi+1;document.getElementById('fc-tot').textContent=d.length;document.getElementById('fcard').classList.remove('flipped');}
+function flip(){document.getElementById('fcard').classList.toggle('flipped');}
+function next(){const d=gD(cl);fi=(fi+1)%d.length;upFc();}
+function prev(){const d=gD(cl);fi=(fi-1+d.length)%d.length;upFc();}
+function mkKn(){const k=cl+'-'+fi;pr[k]={s:'k',t:Date.now()};svPr();next();}
+function mkUnk(){const k=cl+'-'+fi;pr[k]={s:'l',t:Date.now()};svPr();next();}
+function startQz(){const d=gD(cl);qi=0;qc=0;qw=0;qzQuestions=[];const cnt=Math.min(st.qc,d.length);const used=new Set();while(qzQuestions.length<<cnt){const r=Math.floor(Math.random()*d.length);if(!used.has(r)){used.add(r);qzQuestions.push(r);}}document.getElementById('qz-res').classList.add('hid');document.getElementById('qz-cont').classList.remove('hid');upQz();}
+function upQz(){const d=gD(cl);if(qi>=qzQuestions.length){showQzRes();return;}const cur=d[qzQuestions[qi]];document.getElementById('qz-ch').textContent=cur.ch;document.getElementById('qz-py').textContent=cur.py;document.getElementById('qz-c').textContent=qc;document.getElementById('qz-w').textContent=qw;document.getElementById('qz-r').textContent=qzQuestions.length-qi;document.getElementById('qz-pb').style.width=(qi/qzQuestions.length*100)+'%';const opts=[];const ans=cur.mn;opts.push(ans);while(opts.length<<4){const r=d[Math.floor(Math.random()*d.length)].mn;if(!opts.includes(r))opts.push(r);}opts.sort(()=>Math.random()-.5);const btns=document.querySelectorAll('.opt');btns.forEach((b,i)=>{b.textContent=opts[i];b.className='opt';b.disabled=false;});correctAns=opts.indexOf(ans);}
+function selOpt(i){const btns=document.querySelectorAll('.opt');if(i===correctAns){btns[i].classList.add('c');qc++;const k=cl+'-'+qzQuestions[qi];pr[k]={s:'k',t:Date.now()};svPr();if(st.aa){setTimeout(()=>{qi++;upQz();},800);}}else{btns[i].classList.add('w');btns[correctAns].classList.add('c');qw++;}btns.forEach(b=>b.classList.add('d'));if(!st.aa){setTimeout(()=>{qi++;upQz();},1500);}}
+function showQzRes(){document.getElementById('qz-cont').classList.add('hid');document.getElementById('qz-res').classList.remove('hid');const tot=qc+qw;const pct=Math.round(qc/tot*100);document.getElementById('qz-sc').textContent=pct+'%';document.getElementById('res-c').textContent=qc;document.getElementById('res-t').textContent=tot;let msg='';if(pct>=90)msg='Excellent! You are a master!';else if(pct>=70)msg='Great job! Keep practicing!';else if(pct>=50)msg='Good effort! Review the ones you missed.';else msg='Keep studying! You will improve!';document.getElementById('res-msg').textContent=msg;}
+function upWr(){const d=gD(cl);document.getElementById('wr-tg').textContent='?';document.getElementById('wr-py').textContent=d[wi].py;document.getElementById('wr-mn').textContent=d[wi].mn;document.getElementById('wr-in').value='';document.getElementById('wr-in').className='wi';document.getElementById('wr-fb').textContent='';document.getElementById('wr-idx').textContent=wi+1;document.getElementById('wr-tot').textContent=d.length;}
+function chkWr(){const d=gD(cl);const inp=document.getElementById('wr-in');const fb=document.getElementById('wr-fb');if(inp.value===d[wi].ch){inp.classList.add('c');fb.textContent='Correct! '+d[wi].ch+' means '+d[wi].mn;fb.style.color='#4CAF50';const k=cl+'-'+wi;pr[k]={s:'k',t:Date.now()};svPr();setTimeout(()=>{wi=(wi+1)%d.length;upWr();},1500);}else{inp.classList.add('w');fb.textContent='Wrong! The answer is '+d[wi].ch;fb.style.color='#f44336';}}
+function skWr(){wi=(wi+1)%gD(cl).length;upWr();}
+function shHint(){const d=gD(cl);document.getElementById('wr-fb').textContent='Hint: It has '+d[wi].ch.length+' stroke(s)';document.getElementById('wr-fb').style.color='#667eea';}
+function upLs(){const d=gD(cl);document.getElementById('ls-lvl').textContent=cl;const cg=document.getElementById('cg');cg.innerHTML='';d.forEach((c,i)=>{const k=cl+'-'+i;const s=pr[k]?pr[k].s:'u';const stcls=s==='k'?'k':s==='l'?'l':'u';const el=document.createElement('div');el.className='ci';el.innerHTML='<span class="ch">'+c.ch+'</span><span class="py">'+c.py+'</span><span class="st '+stcls+'">'+(s==='k'?'✓':s==='l'?'?':'')+'</span>';el.onclick=()=>alert(c.ch+' ('+c.py+'): '+c.mn+'\nExample: '+c.ex);cg.appendChild(el);});}
+function upPr(){const d=gD(cl);let kn=0,lr=0;for(let k in pr){if(pr[k].s==='k')kn++;else if(pr[k].s==='l')lr++;}document.getElementById('pr-kn').textContent=kn;document.getElementById('pr-lr').textContent=lr;let ms=0;for(let l=1;l<=6;l++){const dl=gD(l);let lkn=0;for(let i=0;i<dl.length;i++){const k=l+'-'+i;if(pr[k]&&pr[k].s==='k')lkn++;}if(lkn/dl.length>=0.8)ms++;}document.getElementById('pr-ms').textContent=ms;const pb=document.getElementById('pr-bars');pb.innerHTML='';for(let l=1;l<=6;l++){const dl=gD(l);let lkn=0;for(let i=0;i<dl.length;i++){const k=l+'-'+i;if(pr[k]&&pr[k].s==='k')lkn++;}const pct=Math.round(lkn/dl.length*100);pb.innerHTML+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span>HSK '+l+'</span><span>'+pct+'%</span></div><div class="pbar"><div class="pfill" style="width:'+pct+'%"></div></div></div>';}}
+function rstPr(){if(confirm('Reset all progress? This cannot be undone.')){pr={};svPr();upPr();}}
+ld();upFc();
+</script>
+</body>
+</html>

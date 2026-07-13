@@ -1,0 +1,682 @@
+html_content = '''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACT 科学复习站</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            border-bottom: 3px solid #3b82f6;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            color: #60a5fa;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        header p { color: #94a3b8; margin-top: 10px; font-size: 1.1rem; }
+        nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            background: #1e293b;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        nav button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 25px;
+            background: #334155;
+            color: #cbd5e1;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        nav button:hover, nav button.active {
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        .section { display: none; animation: fadeIn 0.5s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+            border-left: 4px solid #3b82f6;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .card h3 { color: #60a5fa; margin-bottom: 12px; font-size: 1.3rem; }
+        .card h4 { color: #a78bfa; margin: 15px 0 8px; }
+        .card ul { margin-left: 20px; }
+        .card li { margin: 8px 0; color: #cbd5e1; }
+        .card p { color: #cbd5e1; margin: 8px 0; }
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin: 4px;
+        }
+        .tag-bio { background: #065f46; color: #6ee7b7; }
+        .tag-chem { background: #7c2d12; color: #fdba74; }
+        .tag-phys { background: #1e3a8a; color: #93c5fd; }
+        .tag-earth { background: #713f12; color: #fde047; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #0f172a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th {
+            background: #3b82f6;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #334155;
+            color: #cbd5e1;
+        }
+        tr:hover td { background: #1e293b; }
+        .timer-box {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .timer-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #60a5fa;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+        .timer-controls button {
+            padding: 12px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-start { background: #10b981; color: white; }
+        .btn-pause { background: #f59e0b; color: white; }
+        .btn-reset { background: #ef4444; color: white; }
+        .timer-controls button:hover { transform: scale(1.05); }
+        .progress-container {
+            background: #0f172a;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            border-radius: 10px;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: white;
+        }
+        .formula-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+        .formula {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: #fbbf24;
+            text-align: center;
+            padding: 15px;
+            background: #1e293b;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .tip-box {
+            background: linear-gradient(135deg, #1e3a5f, #0f172a);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #3b82f6;
+        }
+        .tip-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+            border-top: 1px solid #334155;
+            margin-top: 40px;
+        }
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8rem; }
+            .timer-display { font-size: 2.5rem; }
+            nav button { padding: 8px 16px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🧪 ACT 科学复习站</h1>
+        <p>Data Representation | Research Summaries | Conflicting Viewpoints</p>
+    </header>
+    <nav>
+        <button class="active" onclick="showSection('overview')">📋 考试概览</button>
+        <button onclick="showSection('strategies')">🎯 核心策略</button>
+        <button onclick="showSection('biology')">🧬 生物</button>
+        <button onclick="showSection('chemistry')">⚗️ 化学</button>
+        <button onclick="showSection('physics')">🔭 物理</button>
+        <button onclick="showSection('earth')">🌍 地球科学</button>
+        <button onclick="showSection('formulas')">📐 公式</button>
+        <button onclick="showSection('timer')">⏱️ 计时器</button>
+    </nav>
+    <div class="container">
+        <div id="overview" class="section active">
+            <div class="card">
+                <h3>📊 ACT 科学考试结构</h3>
+                <table>
+                    <tr><th>项目</th><th>详情</th></tr>
+                    <tr><td>总时长</td><td>35 分钟</td></tr>
+                    <tr><td>题目数量</td><td>40 道题</td></tr>
+                    <tr><td>文章数量</td><td>6-7 篇（Passages）</td></tr>
+                    <tr><td>每篇文章题目</td><td>5-8 题</td></tr>
+                    <tr><td>每题平均时间</td><td>约 52 秒</td></tr>
+                </table>
+            </div>
+            <div class="card">
+                <h3>📑 三种文章类型</h3>
+                <div class="tip-box">
+                    <h4><span class="tag tag-bio">Data Representation</span> 数据呈现 (约3篇)</h4>
+                    <p>包含图表、表格、图形。考察<strong>读取、理解、推断数据</strong>的能力。</p>
+                    <ul>
+                        <li>不需要背景知识，所有信息都在图表中</li>
+                        <li>关注坐标轴标签、单位、趋势</li>
+                        <li>注意图例和数据范围</li>
+                    </ul>
+                </div>
+                <div class="tip-box">
+                    <h4><span class="tag tag-chem">Research Summaries</span> 研究摘要 (约3篇)</h4>
+                    <p>描述一个或多个实验/研究。考察<strong>实验设计、变量、结果分析</strong>。</p>
+                    <ul>
+                        <li>识别自变量(Independent)和因变量(Dependent)</li>
+                        <li>控制变量(Controlled variables)是什么</li>
+                        <li>比较不同实验组的差异</li>
+                    </ul>
+                </div>
+                <div class="tip-box">
+                    <h4><span class="tag tag-phys">Conflicting Viewpoints</span> 冲突观点 (1篇)</h4>
+                    <p>呈现2-4个科学家/学生的不同假说。考察<strong>理解、比较、评估不同观点</strong>。</p>
+                    <ul>
+                        <li>每个观点的核心主张是什么</li>
+                        <li>观点之间的相同点和不同点</li>
+                        <li>哪些证据支持/反对哪个观点</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card">
+                <h3>⚡ 时间分配策略</h3>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 85%">Passage 1-5: 每篇约 5 分钟</div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 100%">Passage 6 (Conflicting): 约 7-8 分钟</div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 15%; background: linear-gradient(90deg, #ef4444, #f87171)">检查: 约 2-3 分钟</div>
+                </div>
+            </div>
+        </div>
+        <div id="strategies" class="section">
+            <div class="card">
+                <h3>🎯 核心解题策略</h3>
+                <div class="tip-box">
+                    <span class="tip-number">1</span>
+                    <strong>先读题，再看文章</strong>
+                    <p>ACT科学不需要逐字阅读文章。先看题目问什么，然后带着问题去图表/文章中找答案。</p>
+                </div>
+                <div class="tip-box">
+                    <span class="tip-number">2</span>
+                    <strong>关注图表细节</strong>
+                    <p>坐标轴标签、单位、刻度、图例、趋势线、数据点。题目经常考这些细节。</p>
+                </div>
+                <div class="tip-box">
+                    <span class="tip-number">3</span>
+                    <strong>识别变量关系</strong>
+                    <p>正相关(↑↑) | 负相关(↑↓) | 无相关 | 非线性关系。直接在图表中找趋势。</p>
+                </div>
+                <div class="tip-box">
+                    <span class="tip-number">4</span>
+                    <strong>排除法</strong>
+                    <p>先排除明显错误的选项。ACT科学很多题目可以通过排除2-3个错误选项快速定位答案。</p>
+                </div>
+                <div class="tip-box">
+                    <span class="tip-number">5</span>
+                    <strong>不要过度推理</strong>
+                    <p>答案必须基于文章/图表提供的信息。不要带入课外知识（即使你知道更多）。</p>
+                </div>
+                <div class="tip-box">
+                    <span class="tip-number">6</span>
+                    <strong>跳过难题，标记回头做</strong>
+                    <p>35分钟很紧张。如果一道题超过1分钟没思路，先标记（在答题卡上做个记号），做完其他题再回来。</p>
+                </div>
+            </div>
+            <div class="card">
+                <h3>📈 常见题型</h3>
+                <table>
+                    <tr><th>题型</th><th>解题要点</th></tr>
+                    <tr><td>读图题</td><td>直接定位数据点，注意单位和坐标轴</td></tr>
+                    <tr><td>趋势题</td><td>观察整体趋势，不要只看单个数据点</td></tr>
+                    <tr><td>推断题</td><td>基于数据合理推断，不超出图表范围</td></tr>
+                    <tr><td>实验设计题</td><td>识别变量、控制组、实验组</td></tr>
+                    <tr><td>观点比较题</td><td>先分别理解每个观点，再找差异</td></tr>
+                    <tr><td>假设题</td><td>哪个选项如果成立，会支持/削弱某个观点</td></tr>
+                </table>
+            </div>
+        </div>
+        <div id="biology" class="section">
+            <div class="card">
+                <h3>🧬 生物 (Biology) 常考知识点</h3>
+                <span class="tag tag-bio">Cell Biology</span>
+                <span class="tag tag-bio">Genetics</span>
+                <span class="tag tag-bio">Ecology</span>
+                <span class="tag tag-bio">Evolution</span>
+                <span class="tag tag-bio">Human Body</span>
+                <h4>1. 细胞生物学</h4>
+                <ul>
+                    <li><strong>细胞膜</strong>：选择性透过，控制物质进出</li>
+                    <li><strong>细胞器</strong>：线粒体(能量)、叶绿体(光合作用)、核糖体(蛋白质合成)</li>
+                    <li><strong>细胞分裂</strong>：有丝分裂(Mitosis) vs 减数分裂(Meiosis)</li>
+                    <li><strong>光合作用</strong>：6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂ (需要光、叶绿素)</li>
+                    <li><strong>细胞呼吸</strong>：C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATP</li>
+                </ul>
+                <h4>2. 遗传学</h4>
+                <ul>
+                    <li><strong>DNA结构</strong>：双螺旋，碱基配对 A-T, G-C</li>
+                    <li><strong>基因型 vs 表现型</strong>：Genotype是基因组合，Phenotype是表现出来的性状</li>
+                    <li><strong>显性(Dominant) vs 隐性(Recessive)</strong>：大写字母表示显性，小写隐性</li>
+                    <li><strong>Punnett Square</strong>：用于预测后代基因型概率</li>
+                    <li><strong>突变(Mutation)</strong>：DNA序列的改变，可能有害、有益或中性</li>
+                </ul>
+                <h4>3. 生态学</h4>
+                <ul>
+                    <li><strong>食物链/食物网</strong>：生产者(植物) → 初级消费者(食草) → 次级消费者(食肉)</li>
+                    <li><strong>能量金字塔</strong>：每级传递约10%能量，其余以热散失</li>
+                    <li><strong>种群增长</strong>：指数增长(无限资源) vs 逻辑增长(S型曲线，有限资源)</li>
+                    <li><strong>竞争、捕食、共生</strong>：种间关系类型</li>
+                    <li><strong>生态位(Niche)</strong>：生物在生态系统中的角色和位置</li>
+                </ul>
+                <h4>4. 进化论</h4>
+                <ul>
+                    <li><strong>自然选择</strong>：适者生存，有利变异更可能传递</li>
+                    <li><strong>适应性(Adaptation)</strong>：生物特征与环境匹配</li>
+                    <li><strong>遗传变异</strong>：自然选择的基础</li>
+                    <li><strong>物种形成(Speciation)</strong>：新物种产生的过程</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>🧪 生物实验常见变量</h3>
+                <table>
+                    <tr><th>实验类型</th><th>自变量</th><th>因变量</th><th>控制变量</th></tr>
+                    <tr><td>酶活性实验</td><td>温度/pH</td><td>反应速率</td><td>酶浓度、底物浓度</td></tr>
+                    <tr><td>光合作用实验</td><td>光强度/CO₂浓度</td><td>O₂产生量</td><td>温度、植物种类</td></tr>
+                    <tr><td>生长实验</td><td>激素浓度</td><td>植物高度</td><td>光照、水分、土壤</td></tr>
+                    <tr><td>细菌培养</td><td>抗生素浓度</td><td>菌落数量</td><td>培养温度、时间</td></tr>
+                </table>
+            </div>
+        </div>
+        <div id="chemistry" class="section">
+            <div class="card">
+                <h3>⚗️ 化学 (Chemistry) 常考知识点</h3>
+                <span class="tag tag-chem">Atomic Structure</span>
+                <span class="tag tag-chem">Chemical Reactions</span>
+                <span class="tag tag-chem">Stoichiometry</span>
+                <span class="tag tag-chem">Solutions</span>
+                <span class="tag tag-chem">Acids & Bases</span>
+                <h4>1. 原子结构</h4>
+                <ul>
+                    <li><strong>质子(Proton)</strong>：带正电，决定元素种类（原子序数）</li>
+                    <li><strong>中子(Neutron)</strong>：不带电，与质子共同构成原子核</li>
+                    <li><strong>电子(Electron)</strong>：带负电，绕核运动，参与化学键形成</li>
+                    <li><strong>同位素(Isotope)</strong>：质子数相同，中子数不同</li>
+                    <li><strong>离子(Ion)</strong>：失去/获得电子的原子，阳离子(+)，阴离子(-)</li>
+                </ul>
+                <h4>2. 化学键</h4>
+                <ul>
+                    <li><strong>离子键(Ionic)</strong>：金属+非金属，电子转移，如 NaCl</li>
+                    <li><strong>共价键(Covalent)</strong>：非金属+非金属，电子共享，如 H₂O</li>
+                    <li><strong>金属键(Metallic)</strong>：金属原子间，自由电子"海"</li>
+                    <li><strong>极性(Polarity)</strong>：电荷分布不均匀，影响溶解性</li>
+                </ul>
+                <h4>3. 化学反应</h4>
+                <ul>
+                    <li><strong>合成反应</strong>：A + B → AB</li>
+                    <li><strong>分解反应</strong>：AB → A + B</li>
+                    <li><strong>置换反应</strong>：A + BC → AC + B</li>
+                    <li><strong>双置换反应</strong>：AB + CD → AD + CB</li>
+                    <li><strong>燃烧反应</strong>：燃料 + O₂ → CO₂ + H₂O</li>
+                </ul>
+                <h4>4. 溶液与浓度</h4>
+                <ul>
+                    <li><strong>摩尔浓度(Molarity, M)</strong>：mol/L</li>
+                    <li><strong>溶解度(Solubility)</strong>：一定温度下，100g溶剂最多溶解的溶质质量</li>
+                    <li><strong>饱和(Saturated)</strong>：达到最大溶解量</li>
+                    <li><strong>过饱和(Supersaturated)</strong>：超过正常溶解度（不稳定）</li>
+                    <li><strong>稀释</strong>：M₁V₁ = M₂V₂</li>
+                </ul>
+                <h4>5. 酸碱</h4>
+                <ul>
+                    <li><strong>pH 范围</strong>：0-14，7为中性，<7酸性，>7碱性</li>
+                    <li><strong>pH = -log[H⁺]</strong>：每差1个pH单位，[H⁺]差10倍</li>
+                    <li><strong>强酸</strong>：HCl, H₂SO₄, HNO₃ — 完全电离</li>
+                    <li><strong>强碱</strong>：NaOH, KOH — 完全电离</li>
+                    <li><strong>中和反应</strong>：酸 + 碱 → 盐 + 水</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>🔥 化学实验常见变量</h3>
+                <table>
+                    <tr><th>实验类型</th><th>自变量</th><th>因变量</th><th>控制变量</th></tr>
+                    <tr><td>反应速率</td><td>温度/浓度/催化剂</td><td>反应时间/产物量</td><td>反应物体积</td></tr>
+                    <tr><td>溶解度</td><td>温度</td><td>溶解质量</td><td>溶剂种类/体积</td></tr>
+                    <tr><td>酸碱滴定</td><td>滴定液体积</td><td>pH变化</td><td>初始浓度</td></tr>
+                    <tr><td>气体收集</td><td>反应物质量</td><td>气体体积</td><td>温度/压强</td></tr>
+                </table>
+            </div>
+        </div>
+        <div id="physics" class="section">
+            <div class="card">
+                <h3>🔭 物理 (Physics) 常考知识点</h3>
+                <span class="tag tag-phys">Mechanics</span>
+                <span class="tag tag-phys">Electricity</span>
+                <span class="tag tag-phys">Waves</span>
+                <span class="tag tag-phys">Thermodynamics</span>
+                <h4>1. 力学</h4>
+                <ul>
+                    <li><strong>速度(Velocity)</strong>：位移/时间，矢量（有方向）</li>
+                    <li><strong>加速度(Acceleration)</strong>：速度变化率，a = Δv/Δt</li>
+                    <li><strong>牛顿第一定律</strong>：惯性，物体保持静止或匀速直线运动</li>
+                    <li><strong>牛顿第二定律</strong>：F = ma，力=质量×加速度</li>
+                    <li><strong>牛顿第三定律</strong>：作用力与反作用力大小相等、方向相反</li>
+                    <li><strong>重力</strong>：F = mg，g ≈ 9.8 m/s² (地球表面)</li>
+                    <li><strong>摩擦力</strong>：阻碍相对运动，与正压力成正比</li>
+                </ul>
+                <h4>2. 电学</h4>
+                <ul>
+                    <li><strong>电流(Current, I)</strong>：电荷流动速率，单位安培(A)</li>
+                    <li><strong>电压(Voltage, V)</strong>：电势差，单位伏特(V)</li>
+                    <li><strong>电阻(Resistance, R)</strong>：阻碍电流，单位欧姆(Ω)</li>
+                    <li><strong>欧姆定律</strong>：V = IR</li>
+                    <li><strong>串联</strong>：R_total = R₁ + R₂ + R₃，电流相同</li>
+                    <li><strong>并联</strong>：1/R_total = 1/R₁ + 1/R₂ + 1/R₃，电压相同</li>
+                    <li><strong>电功率</strong>：P = VI = I²R = V²/R</li>
+                </ul>
+                <h4>3. 波动</h4>
+                <ul>
+                    <li><strong>波长(Wavelength, λ)</strong>：相邻波峰/波谷的距离</li>
+                    <li><strong>频率(Frequency, f)</strong>：每秒振动次数，单位赫兹(Hz)</li>
+                    <li><strong>波速</strong>：v = f × λ</li>
+                    <li><strong>振幅(Amplitude)</strong>：最大位移，决定波的强度/响度</li>
+                    <li><strong>声波</strong>：纵波，需要介质，不能在真空中传播</li>
+                    <li><strong>光波</strong>：横波，电磁波，可在真空中传播</li>
+                    <li><strong>折射</strong>：光从一种介质进入另一种时方向改变，n = c/v</li>
+                </ul>
+                <h4>4. 热力学</h4>
+                <ul>
+                    <li><strong>温度</strong>：分子平均动能的量度</li>
+                    <li><strong>热量(Heat)</strong>：能量传递形式，单位焦耳(J)或卡路里(cal)</li>
+                    <li><strong>比热容(Specific Heat)</strong>：使1g物质升高1°C所需热量</li>
+                    <li><strong>热传递方式</strong>：传导(固体)、对流(流体)、辐射(电磁波)</li>
+                    <li><strong>热膨胀</strong>：温度升高，大多数物质体积增大</li>
+                    <li><strong>物态变化</strong>：熔化、凝固、汽化、液化、升华、凝华</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>⚡ 物理实验常见变量</h3>
+                <table>
+                    <tr><th>实验类型</th><th>自变量</th><th>因变量</th><th>控制变量</th></tr>
+                    <tr><td>自由落体</td><td>下落高度</td><td>落地时间</td><td>物体质量/形状</td></tr>
+                    <tr><td>斜面运动</td><td>斜面角度</td><td>加速度</td><td>物体质量/表面</td></tr>
+                    <tr><td>电路实验</td><td>电阻值</td><td>电流/电压</td><td>电源电压</td></tr>
+                    <tr><td>光学实验</td><td>入射角度</td><td>折射角度</td><td>介质种类</td></tr>
+                </table>
+            </div>
+        </div>
+        <div id="earth" class="section">
+            <div class="card">
+                <h3>🌍 地球科学 (Earth Science) 常考知识点</h3>
+                <span class="tag tag-earth">Geology</span>
+                <span class="tag tag-earth">Meteorology</span>
+                <span class="tag tag-earth">Oceanography</span>
+                <span class="tag tag-earth">Astronomy</span>
+                <h4>1. 地质学</h4>
+                <ul>
+                    <li><strong>岩石类型</strong>：火成岩(Igneous)、沉积岩(Sedimentary)、变质岩(Metamorphic)</li>
+                    <li><strong>板块构造</strong>：地壳分为若干板块，不断运动</li>
+                    <li><strong>地震</strong>：板块边界应力释放，震源(Focus)、震中(Epicenter)</li>
+                    <li><strong>火山</strong>：岩浆喷出地表，沿板块边界分布</li>
+                    <li><strong>风化作用</strong>：物理风化(温度、冰冻)和化学风化(水、酸)</li>
+                    <li><strong>侵蚀与沉积</strong>：水、风、冰搬运物质，沉积形成新岩层</li>
+                </ul>
+                <h4>2. 气象学</h4>
+                <ul>
+                    <li><strong>大气层</strong>：对流层(Troposphere)、平流层(Stratosphere)、中间层、热层</li>
+                    <li><strong>气压</strong>：空气重量产生的压力，高气压→下沉气流→晴天；低气压→上升气流→阴雨</li>
+                    <li><strong>风</strong>：从高压吹向低压，受科里奥利力影响偏转</li>
+                    <li><strong>水循环</strong>：蒸发 → 凝结 → 降水 → 径流/渗透</li>
+                    <li><strong>锋面</strong>：冷锋(冷空气推进)、暖锋(暖空气推进)、静止锋</li>
+                    <li><strong>温室效应</strong>：CO₂等气体吸收红外辐射，使地表温度升高</li>
+                </ul>
+                <h4>3. 海洋学</h4>
+                <ul>
+                    <li><strong>洋流</strong>：暖流(低纬→高纬)、寒流(高纬→低纬)，影响气候</li>
+                    <li><strong>潮汐</strong>：月球引力主导，太阳引力辅助，大潮(Spring tide)、小潮(Neap tide)</li>
+                    <li><strong>盐度</strong>：海水含盐量，蒸发强则盐度高，降水/融冰则盐度低</li>
+                    <li><strong>深海热液</strong>：海底火山口，高温高压，特殊生态系统</li>
+                </ul>
+                <h4>4. 天文学</h4>
+                <ul>
+                    <li><strong>太阳系</strong>：8大行星，按距离太阳：水金地火木土天海</li>
+                    <li><strong>恒星演化</strong>：星云 → 原恒星 → 主序星 → 红巨星 → 白矮星/中子星/黑洞</li>
+                    <li><strong>光年(Light-year)</strong>：光一年走的距离，约9.46×10¹² km</li>
+                    <li><strong>光谱</strong>：恒星成分可通过光谱分析（发射/吸收谱线）</li>
+                    <li><strong>宇宙膨胀</strong>：星系相互远离，红移现象证明</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>🌊 地球科学实验常见变量</h3>
+                <table>
+                    <tr><th>实验类型</th><th>自变量</th><th>因变量</th><th>控制变量</th></tr>
+                    <tr><td>侵蚀实验</td><td>坡度/水流速度</td><td>侵蚀量</td><td>土壤类型</td></tr>
+                    <tr><td>温室效应</td><td>CO₂浓度</td><td>温度上升</td><td>光照强度</td></tr>
+                    <tr><td>矿物溶解</td><td>酸度(pH)</td><td>溶解速率</td><td>温度/矿物质量</td></tr>
+                    <tr><td>沉积实验</td><td>颗粒大小</td><td>沉降时间</td><td>水深度</td></tr>
+                </table>
+            </div>
+        </div>
+        <div id="formulas" class="section">
+            <div class="card">
+                <h3>📐 核心公式速查</h3>
+                <div class="formula-card">
+                    <h4>🔭 物理公式</h4>
+                    <div class="formula">v = d / t &nbsp;&nbsp;(速度 = 距离 / 时间)</div>
+                    <div class="formula">a = Δv / Δt &nbsp;&nbsp;(加速度 = 速度变化 / 时间)</div>
+                    <div class="formula">F = m × a &nbsp;&nbsp;(力 = 质量 × 加速度)</div>
+                    <div class="formula">W = F × d &nbsp;&nbsp;(功 = 力 × 距离)</div>
+                    <div class="formula">P = W / t &nbsp;&nbsp;(功率 = 功 / 时间)</div>
+                    <div class="formula">V = I × R &nbsp;&nbsp;(欧姆定律：电压 = 电流 × 电阻)</div>
+                    <div class="formula">P = V × I = I² × R &nbsp;&nbsp;(电功率)</div>
+                    <div class="formula">v = f × λ &nbsp;&nbsp;(波速 = 频率 × 波长)</div>
+                    <div class="formula">g = 9.8 m/s² &nbsp;&nbsp;(重力加速度)</div>
+                </div>
+                <div class="formula-card">
+                    <h4>⚗️ 化学公式</h4>
+                    <div class="formula">M = n / V &nbsp;&nbsp;(摩尔浓度 = 摩尔数 / 体积)</div>
+                    <div class="formula">M₁V₁ = M₂V₂ &nbsp;&nbsp;(稀释公式)</div>
+                    <div class="formula">pH = -log[H⁺] &nbsp;&nbsp;(pH计算公式)</div>
+                    <div class="formula">PV = nRT &nbsp;&nbsp;(理想气体状态方程)</div>
+                    <div class="formula">密度 = 质量 / 体积</div>
+                </div>
+                <div class="formula-card">
+                    <h4>🧬 生物/生态公式</h4>
+                    <div class="formula">种群增长率 = (出生数 - 死亡数) / 总数</div>
+                    <div class="formula">能量传递效率 ≈ 10% (营养级之间)</div>
+                    <div class="formula">光合效率 = 产生的O₂量 / 消耗的CO₂量</div>
+                </div>
+                <div class="formula-card">
+                    <h4>🌍 地球科学公式</h4>
+                    <div class="formula">地震波速 = 距离 / 时间</div>
+                    <div class="formula">密度 = 质量 / 体积 (用于矿物鉴定)</div>
+                    <div class="formula">1光年 ≈ 9.46 × 10¹² km</div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>📊 单位换算</h3>
+                <table>
+                    <tr><th>单位</th><th>换算关系</th></tr>
+                    <tr><td>长度</td><td>1 m = 100 cm = 1000 mm; 1 km = 1000 m</td></tr>
+                    <tr><td>质量</td><td>1 kg = 1000 g; 1 g = 1000 mg</td></tr>
+                    <tr><td>体积</td><td>1 L = 1000 mL = 1000 cm³</td></tr>
+                    <tr><td>温度</td><td>°C = (°F - 32) × 5/9; K = °C + 273.15</td></tr>
+                    <tr><td>时间</td><td>1 min = 60 s; 1 h = 60 min = 3600 s</td></tr>
+                    <tr><td>压强</td><td>1 atm = 101.325 kPa = 760 mmHg</td></tr>
+                </table>
+            </div>
+        </div>
+        <div id="timer" class="section">
+            <div class="timer-box">
+                <h3>⏱️ ACT 科学计时器</h3>
+                <p style="color:#94a3b8;margin-bottom:20px;">模拟 35 分钟考试环境</p>
+                <div class="timer-display" id="timerDisplay">35:00</div>
+                <div class="timer-controls">
+                    <button class="btn-start" onclick="startTimer()">▶ 开始</button>
+                    <button class="btn-pause" onclick="pauseTimer()">⏸ 暂停</button>
+                    <button class="btn-reset" onclick="resetTimer()">↺ 重置</button>
+                </div>
+                <p id="timerStatus" style="margin-top:15px;color:#60a5fa;">准备就绪</p>
+            </div>
+            <div class="card">
+                <h3>📋 分段计时建议</h3>
+                <table>
+                    <tr><th>阶段</th><th>时间</th><th>任务</th></tr>
+                    <tr><td>Passage 1</td><td>0:00 - 5:00</td><td>数据呈现类，快速读图</td></tr>
+                    <tr><td>Passage 2</td><td>5:00 - 10:00</td><td>数据呈现类</td></tr>
+                    <tr><td>Passage 3</td><td>10:00 - 15:00</td><td>研究摘要类</td></tr>
+                    <tr><td>Passage 4</td><td>15:00 - 20:00</td><td>研究摘要类</td></tr>
+                    <tr><td>Passage 5</td><td>20:00 - 25:00</td><td>数据呈现/研究摘要</td></tr>
+                    <tr><td>Passage 6</td><td>25:00 - 32:00</td><td>冲突观点类（留更多时间）</td></tr>
+                    <tr><td>检查</td><td>32:00 - 35:00</td><td>回顾标记的难题</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>🎯 ACT 科学复习站 | 祝你考试顺利！</p>
+        <p style="font-size:0.9rem;margin-top:5px;">Remember: Don't overthink. The answer is in the passage.</p>
+    </footer>
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        let timeLeft = 35 * 60;
+        let timerInterval = null;
+        let isRunning = false;
+        function updateDisplay() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            document.getElementById('timerDisplay').textContent = 
+                String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+            if (timeLeft <= 300) {
+                document.getElementById('timerDisplay').style.color = '#ef4444';
+            } else if (timeLeft <= 600) {
+                document.getElementById('timerDisplay').style.color = '#f59e0b';
+            } else {
+                document.getElementById('timerDisplay').style.color = '#60a5fa';
+            }
+        }
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            document.getElementById('timerStatus').textContent = '计时中...';
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    document.getElementById('timerStatus').textContent = '时间到！';
+                    alert('⏰ 35分钟已到！');
+                }
+            }, 1000);
+        }
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            document.getElementById('timerStatus').textContent = '已暂停';
+        }
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timeLeft = 35 * 60;
+            updateDisplay();
+            document.getElementById('timerStatus').textContent = '准备就绪';
+        }
+        updateDisplay();
+    </script>
+</body>
+</html>'''
+
+# 保存到文件
+with open('act_science_review.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print("✅ 文件已保存为 act_science_review.html")
+print(f"📄 文件大小: {len(html_content)} 字符")
+print("🌐 用浏览器打开即可使用")
